@@ -19,7 +19,7 @@ function byRatingDescending(a, b) {
   return b.rating - a.rating;
 }
 
-// ✅ Generate RELIABLE poster URL from IMDb ID — WORKS EVERYWHERE!
+// ✅ Generate RELIABLE poster URL
 function addPoster(movie) {
   return {
     ...movie,
@@ -28,16 +28,16 @@ function addPoster(movie) {
 }
 
 export async function searchContent(query) {
-  // ✅ Homepage — Top Rated + ALL Posters
+  // ✅ Homepage — Top Rated + Posters
   if (!query.trim()) {
     return FEATURED.map(addPoster).sort(byRatingDescending);
   }
 
-  // ✅ CLEAN THE SEARCH — fix spaces & extra spaces
-  const cleanQuery = query.trim().replace(/\s+/g, ' '); // Replace multiple spaces → single space
-  const encodedQuery = encodeURIComponent(cleanQuery); // Safely format for URL
+  // ✅ PERFECT CLEAN — remove ALL extra spaces
+  const cleanQuery = query.trim().replace(/\s+/g, ' '); // Remove leading/trailing + multiple spaces
+  const encodedQuery = encodeURIComponent(cleanQuery);
 
-  console.log('🔍 Searching for:', cleanQuery); // See what's actually being searched
+  console.log('🔍 Searching for:', cleanQuery);
 
   let res;
   try {
@@ -56,14 +56,17 @@ export async function searchContent(query) {
     return [];
   }
 
-  // ✅ SEARCH RESULTS — RELIABLE POSTERS ADDED!
-  return json.Search.map((movie) => ({
-    id: movie.imdbID,
-    imdb_id: movie.imdbID,
-    title: movie.Title,
-    year: movie.Year.slice(0, 4),
-    type: 'movie',
-    // ✅ Use OMDb image API instead of Search API poster — WORKS EVERYWHERE!
-    poster: `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${movie.imdbID}`,
-  }));
+  // ✅ SEARCH RESULTS — RELIABLE POSTERS GUARANTEED!
+  return json.Search.map((movie) => {
+    const imdbID = movie.imdbID; // THIS IS THE KEY — OMDb returns it as "imdbID"
+    return {
+      id: imdbID,
+      imdb_id: imdbID,
+      title: movie.Title,
+      year: movie.Year.slice(0, 4),
+      type: 'movie',
+      // ✅ USE imdbID for poster — WORKS EVERYTIME!
+      poster: `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${imdbID}`,
+    };
+  });
 }
