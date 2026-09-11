@@ -1,6 +1,6 @@
 const OMDB_KEY = '390c6805';
 
-// ✅ TOP RATED MOVIES — with IMDb IDs for auto-posters
+// ✅ TOP RATED — Highest Rating First
 const FEATURED = [
   { id: 'tt0111161', imdb_id: 'tt0111161', title: 'The Shawshank Redemption', year: '1994', rating: 9.3, type: 'movie' },
   { id: 'tt6751668', imdb_id: 'tt6751668', title: 'Parasite', year: '2019', rating: 8.5, type: 'movie' },
@@ -19,30 +19,30 @@ function byRatingDescending(a, b) {
   return b.rating - a.rating;
 }
 
-// 🎲 YOUR IDEA: If NO poster → use RANDOM image!
-function getPosterOrRandom(movie) {
-  // ✅ FIRST: Try OMDb image from IMDb ID
-  if (movie.imdb_id || movie.imdbID) {
-    const id = movie.imdb_id || movie.imdbID;
-    return `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${id}`;
+// 🎯 THE BEST: Try OMDb Poster FIRST → Fallback to Beautiful Picsum Image
+function getPoster(movie) {
+  const imdbId = movie.imdb_id || movie.imdbID;
+
+  // ✅ FIRST: Try OMDb image API (most reliable!)
+  if (imdbId) {
+    return `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${imdbId}`;
   }
-  
-  // 🎲 FALLBACK: NO poster found → GENERATE RANDOM IMAGE!
-  // We use the movie title/ID as seed → SAME movie gets SAME random image every time!
-  const seed = encodeURIComponent(movie.title || movie.imdb_id || 'movie');
+
+  // 🎲 FALLBACK: Beautiful random photography — SAME movie = SAME image!
+  const seed = encodeURIComponent(imdbId || movie.title || 'movie');
   return `https://picsum.photos/seed/${seed}/300/450`;
 }
 
 export async function searchContent(query) {
-  // ✅ HOMEPAGE — Top Rated with posters OR random images
+  // ✅ HOMEPAGE — Top Rated with Posters
   if (!query.trim()) {
     return FEATURED.map((movie) => ({
       ...movie,
-      poster: getPosterOrRandom(movie)
+      poster: getPoster(movie)
     })).sort(byRatingDescending);
   }
 
-  // ✅ SEARCH — clean spaces still work
+  // ✅ SEARCH — Clean spaces still work
   const cleanQuery = query.trim().replace(/\s+/g, ' ');
   const encodedQuery = encodeURIComponent(cleanQuery);
 
@@ -60,16 +60,16 @@ export async function searchContent(query) {
   const json = await res.json();
   if (json.Response === 'False') return [];
 
-  // ✅ SEARCH RESULTS — Poster OR Random Image!
+  // ✅ SEARCH RESULTS — Poster OR Beautiful Fallback Image
   return json.Search.map((movie) => ({
     id: movie.imdbID,
     imdb_id: movie.imdbID,
     title: movie.Title,
     year: movie.Year.slice(0, 4),
     type: 'movie',
-    // 🎲 YOUR IDEA: Real poster OR random image!
-    poster: movie.Poster && movie.Poster !== 'N/A' 
-      ? movie.Poster 
+    // 🎯 TRY → FALLBACK — NEVER BLANK!
+    poster: movie.Poster && movie.Poster !== 'N/A'
+      ? movie.Poster
       : `https://picsum.photos/seed/${movie.imdbID}/300/450`,
   }));
 }
