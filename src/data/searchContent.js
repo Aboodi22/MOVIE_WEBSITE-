@@ -1,6 +1,6 @@
 const OMDB_KEY = '390c6805';
 
-// ✅ TOP RATED — with working poster URLs
+// ✅ TOP RATED — with WORKING poster URLs
 const FEATURED = [
   { id: 'tt0111161', imdb_id: 'tt0111161', title: 'The Shawshank Redemption', year: '1994', rating: 9.3, type: 'movie', poster: 'https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiZDYtOWY5ZGI4NjE0Njc5XkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_SX300.jpg' },
   { id: 'tt6751668', imdb_id: 'tt6751668', title: 'Parasite', year: '2019', rating: 8.5, type: 'movie', poster: 'https://m.media-amazon.com/images/M/MV5BYjk1Y2U4MjQtY2ZiNS00OWQyLWI3MmItZGIyZGEyNjEwZWMwXkEyXkFqcGdeQXVyMzQwMTY2Nzk@._V1_SX300.jpg' },
@@ -19,13 +19,28 @@ function byRatingDescending(a, b) {
   return b.rating - a.rating;
 }
 
+// ✅ YOUR FALLBACK IDEA: Try Poster #1 → if missing → Try Poster #2 → if missing → Try Poster #3
+function getBestPoster(movie) {
+  // ✅ FIRST: Use poster OMDb search gave us
+  if (movie.Poster && movie.Poster !== 'N/A') {
+    return movie.Poster;
+  }
+  // ✅ SECOND: Try OMDb image API from IMDb ID
+  if (movie.imdbID || movie.imdb_id) {
+    const id = movie.imdbID || movie.imdb_id;
+    return `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${id}`;
+  }
+  // ✅ THIRD: Nothing found → return empty (shows fallback initials)
+  return null;
+}
+
 export async function searchContent(query) {
-  // ✅ Homepage — Top Rated
+  // ✅ HOMEPAGE — Top Rated with ALL posters
   if (!query.trim()) {
     return [...FEATURED].sort(byRatingDescending);
   }
 
-  // ✅ Clean search query — remove extra spaces
+  // ✅ SEARCH — clean spaces still work
   const cleanQuery = query.trim().replace(/\s+/g, ' ');
   const encodedQuery = encodeURIComponent(cleanQuery);
 
@@ -43,14 +58,13 @@ export async function searchContent(query) {
   const json = await res.json();
   if (json.Response === 'False') return [];
 
-  // ✅ USE POSTER URL THAT OMDb ALREADY SENDS — NO GUESSING!
+  // ✅ SEARCH RESULTS — use YOUR "if, if, else" fallback logic!
   return json.Search.map((movie) => ({
     id: movie.imdbID,
     imdb_id: movie.imdbID,
     title: movie.Title,
     year: movie.Year.slice(0, 4),
     type: 'movie',
-    // ✅ OMDb Search API ALREADY gives Poster URL! Use it directly!
-    poster: movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : null,
+    poster: getBestPoster(movie), // 🎯 YOUR IDEA: try 3 ways to find poster!
   }));
 }
