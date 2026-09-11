@@ -1,6 +1,6 @@
 const OMDB_KEY = '390c6805';
 
-// ✅ TOP RATED — Using OMDb IMAGE URLs (WORKS EVERYWHERE! NO BLOCKS!)
+// ✅ TOP RATED MOVIES — with IMDb IDs for auto-posters
 const FEATURED = [
   { id: 'tt0111161', imdb_id: 'tt0111161', title: 'The Shawshank Redemption', year: '1994', rating: 9.3, type: 'movie' },
   { id: 'tt6751668', imdb_id: 'tt6751668', title: 'Parasite', year: '2019', rating: 8.5, type: 'movie' },
@@ -19,18 +19,27 @@ function byRatingDescending(a, b) {
   return b.rating - a.rating;
 }
 
-// ✅ AUTO-GENERATE WORKING POSTER URL from IMDb ID — NO BLOCKS!
-function addPoster(movie) {
-  return {
-    ...movie,
-    poster: `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${movie.imdb_id}`
-  };
+// 🎲 YOUR IDEA: If NO poster → use RANDOM image!
+function getPosterOrRandom(movie) {
+  // ✅ FIRST: Try OMDb image from IMDb ID
+  if (movie.imdb_id || movie.imdbID) {
+    const id = movie.imdb_id || movie.imdbID;
+    return `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${id}`;
+  }
+  
+  // 🎲 FALLBACK: NO poster found → GENERATE RANDOM IMAGE!
+  // We use the movie title/ID as seed → SAME movie gets SAME random image every time!
+  const seed = encodeURIComponent(movie.title || movie.imdb_id || 'movie');
+  return `https://picsum.photos/seed/${seed}/300/450`;
 }
 
 export async function searchContent(query) {
-  // ✅ HOMEPAGE — ALL POSTERS WILL LOAD!
+  // ✅ HOMEPAGE — Top Rated with posters OR random images
   if (!query.trim()) {
-    return FEATURED.map(addPoster).sort(byRatingDescending);
+    return FEATURED.map((movie) => ({
+      ...movie,
+      poster: getPosterOrRandom(movie)
+    })).sort(byRatingDescending);
   }
 
   // ✅ SEARCH — clean spaces still work
@@ -51,13 +60,16 @@ export async function searchContent(query) {
   const json = await res.json();
   if (json.Response === 'False') return [];
 
-  // ✅ SEARCH RESULTS — use OMDb direct poster if available
+  // ✅ SEARCH RESULTS — Poster OR Random Image!
   return json.Search.map((movie) => ({
     id: movie.imdbID,
     imdb_id: movie.imdbID,
     title: movie.Title,
     year: movie.Year.slice(0, 4),
     type: 'movie',
-    poster: movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : `https://img.omdbapi.com/?apikey=${OMDB_KEY}&i=${movie.imdbID}`,
+    // 🎲 YOUR IDEA: Real poster OR random image!
+    poster: movie.Poster && movie.Poster !== 'N/A' 
+      ? movie.Poster 
+      : `https://picsum.photos/seed/${movie.imdbID}/300/450`,
   }));
 }
