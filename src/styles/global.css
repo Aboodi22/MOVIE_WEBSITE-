@@ -1,0 +1,192 @@
+:root {
+  /* Dark hero surface — Apple product-page launch treatment */
+  --hero-bg: #000000;
+
+  /* Light content surfaces — Apple.com body sections */
+  --surface: #ffffff;
+  --surface-alt: #f5f5f7;
+  --ink: #1d1d1f;
+  --ink-muted: #6e6e73;
+  --hairline: rgba(0, 0, 0, 0.08);
+  --hairline-strong: rgba(0, 0, 0, 0.14);
+
+  --accent: #0071e3;
+  --accent-press: #0058b0;
+  --accent-soft: rgba(0, 113, 227, 0.12);
+
+  --on-dark: #f5f5f7;
+  --on-dark-muted: rgba(245, 245, 247, 0.68);
+  --dark-hairline: rgba(255, 255, 255, 0.14);
+
+  --danger: #d70015;
+
+  --nav-height: 52px;
+
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+
+  --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------- Top navigation ---------- */
+
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.35s var(--ease), border-color 0.35s var(--ease), backdrop-filter 0.35s var(--ease);
+}
+
+.site-nav.is-scrolled {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.brand-button {
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  color: var(--on-dark);
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: color 0.35s var(--ease), background 0.15s ease, transform 0.15s ease;
+}
+
+.site-nav.is-scrolled .brand-button {
+  color: var(--ink);
+}
+
+.brand-button:hover {
+  background: rgba(128, 128, 128, 0.14);
+}
+
+.brand-button:active {
+  transform: scale(0.97);
+}
+
+.brand-dot {
+  color: var(--accent);
+}
+
+/* ---------- Offline / error banner ---------- */
+
+.status-banner {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  z-index: 49;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 20px;
+  background: #1d1d1f;
+  color: var(--on-dark);
+  font-size: 0.88rem;
+  text-align: center;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.status-banner.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.status-banner button {
+  appearance: none;
+  border: 1px solid var(--dark-hairline);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--on-dark);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.status-banner button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}

@@ -1,0 +1,81 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--hero-bg);
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-canvas canvas {
+  display: block;
+}
+
+.hero-canvas::after {
+  /* Subtle vignette so the centered type always reads, whatever the
+     3D field is doing behind it. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 620px;
+  padding: 0 24px;
+  text-align: center;
+  color: var(--on-dark);
+}
+
+.hero-kicker {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--on-dark-muted);
+  margin: 0 0 16px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.6rem, 6.4vw, 4.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  margin: 0 0 28px;
+}
+
+.hero-title .hero-accent {
+  color: var(--accent);
+}
+
+.scroll-cue {
+  appearance: none;
+  border: 1px solid var(--dark-hairline);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--on-dark);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+}
+
+.scroll-cue:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.scroll-cue:active {
+  transform: scale(0.97);
+}
