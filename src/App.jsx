@@ -1,14 +1,19 @@
+import { BrowserRouter as Router, Routes, Route, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Hero from './components/Hero.jsx';
 import SearchBar from './components/SearchBar.jsx';
 import ResultsGrid from './components/ResultsGrid.jsx';
 import WhereToWatch from './components/WhereToWatch.jsx';
+import SearchPage from './pages/SearchPage.jsx';
 import { searchContent } from './data/searchContent.js';
 
 const SEARCH_REVEAL_DISTANCE = 720;
 const NAV_SOLID_DISTANCE = 40;
 
-export default function App() {
+// Homepage Component
+function HomePage() {
+  const navigate = useNavigate(); // For redirecting to /search/QUERY
+
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,9 +31,20 @@ export default function App() {
   const watchSectionRef = useRef(null);
   const requestIdRef = useRef(0); // 👈 pour ignorer les résultats périmés
 
+  // ✅ NEW: Search → Navigate to /search/QUERY page
+  const handleSearch = useCallback((searchText) => {
+    const q = searchText.trim();
+    if (q) {
+      navigate(`/search/${encodeURIComponent(q)}`); // Opens NEW clean URL!
+    }
+  }, [navigate]);
+
   const runSearch = useCallback(async (q) => {
+<<<<<<< HEAD
     const requestId = ++requestIdRef.current;
     console.log('🔍 Searching for:', q || '(Homepage — Featured Movies)');
+=======
+>>>>>>> 9354a0aba46d2037f41bcaef64841dc166d32ce2
     setQuery(q);
     lastQueryRef.current = q;
     setHasSearched(q.trim().length > 0);
@@ -37,12 +53,17 @@ export default function App() {
     setSelectedItem(null);
     try {
       const data = await searchContent(q);
+<<<<<<< HEAD
       if (requestId !== requestIdRef.current) return; // une recherche plus récente a été lancée entre-temps
       console.log('✅ Got results:', data.length, 'movies');
       setResults(data);
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
       console.error('❌ Search error:', err);
+=======
+      setResults(data);
+    } catch (err) {
+>>>>>>> 9354a0aba46d2037f41bcaef64841dc166d32ce2
       setHasError(true);
       setResults([]);
     } finally {
@@ -52,14 +73,9 @@ export default function App() {
     }
   }, []);
 
-  // ✅ Load NEWEST movies on homepage — WITH ERROR HANDLER
+  // Load featured movies on homepage
   useEffect(() => {
-    console.log('🚀 App started — loading featured movies...');
-    runSearch('').catch((err) => {
-      console.error('❌ Initial load failed:', err);
-      setIsLoading(false);
-      setHasError(true);
-    });
+    runSearch('');
   }, [runSearch]);
 
   // Scroll effects
@@ -79,7 +95,7 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Online/Offline detection
+  // Online/offline
   useEffect(() => {
     const goOnline = () => setIsOnline(true);
     const goOffline = () => setIsOnline(false);
@@ -106,7 +122,7 @@ export default function App() {
   }, [hasSearched]);
 
   const handleRefresh = () => {
-    window.location.reload();
+    window.location.href = '/';
   };
 
   const handleRetry = () => {
@@ -141,22 +157,17 @@ export default function App() {
           Every title, <span className="hero-accent">one search</span> away
         </h1>
         <button className="scroll-cue" onClick={scrollToResults}>
-          Browse the newest releases
+          Browse the Top Rated of All Time
         </button>
       </Hero>
 
       <div className={`search-reveal${isSearchVisible ? ' is-visible' : ''}`}>
-        <SearchBar onSearch={runSearch} isLoading={isLoading} />
+        <SearchBar onSearch={handleSearch} isLoading={isLoading} />
       </div>
 
       <section className="results-section" ref={resultsSectionRef}>
-        <h2 className="results-heading">
-          {hasSearched ? `Results for "${query}"` : 'Top Rated Movies'}
-        </h2>
-
-        {!hasSearched && !hasError && (
-        <p className="results-subheading">Highest rated of all time.</p>
-        )}
+        <h2 className="results-heading">Top Rated Movies of All Time</h2>
+        <p className="results-subheading">The greatest films, highest rated first.</p>
 
         {selectedItem && (
           <div ref={watchSectionRef}>
@@ -167,13 +178,28 @@ export default function App() {
         <ResultsGrid
           results={results}
           isLoading={isLoading}
-          hasSearched={hasSearched}
+          hasSearched={false}
           hasError={hasError}
-          query={query}
+          query=""
           onSelect={setSelectedItem}
           onRetry={handleRetry}
         />
       </section>
     </>
+  );
+}
+
+// ✅ MAIN APP WITH ROUTES
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* Homepage = Top 150 Movies */}
+        <Route path="/" element={<HomePage />} />
+        
+        {/* ✅ Search Page = CLEAN URL like /search/moviename */}
+        <Route path="/search/:query" element={<SearchPage />} />
+      </Routes>
+    </Router>
   );
 }
