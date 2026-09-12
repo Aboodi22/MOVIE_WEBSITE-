@@ -23,8 +23,11 @@ export default function App() {
   const [justRetried, setJustRetried] = useState(false);
   const lastQueryRef = useRef('');
   const resultsSectionRef = useRef(null);
+  const watchSectionRef = useRef(null);
+  const requestIdRef = useRef(0); // 👈 pour ignorer les résultats périmés
 
   const runSearch = useCallback(async (q) => {
+    const requestId = ++requestIdRef.current;
     console.log('🔍 Searching for:', q || '(Homepage — Featured Movies)');
     setQuery(q);
     lastQueryRef.current = q;
@@ -34,14 +37,18 @@ export default function App() {
     setSelectedItem(null);
     try {
       const data = await searchContent(q);
+      if (requestId !== requestIdRef.current) return; // une recherche plus récente a été lancée entre-temps
       console.log('✅ Got results:', data.length, 'movies');
       setResults(data);
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       console.error('❌ Search error:', err);
       setHasError(true);
       setResults([]);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
@@ -83,6 +90,20 @@ export default function App() {
       window.removeEventListener('offline', goOffline);
     };
   }, []);
+
+  // 👇 Scroll automatique vers le lecteur dès qu'un film est sélectionné
+  useEffect(() => {
+    if (selectedItem && watchSectionRef.current) {
+      watchSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedItem]);
+
+  // 👇 Scroll automatique vers les résultats dès qu'une recherche est faite
+  useEffect(() => {
+    if (hasSearched) {
+      resultsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [hasSearched]);
 
   const handleRefresh = () => {
     window.location.reload();
@@ -138,7 +159,9 @@ export default function App() {
         )}
 
         {selectedItem && (
-          <WhereToWatch item={selectedItem} onClose={() => setSelectedItem(null)} />
+          <div ref={watchSectionRef}>
+            <WhereToWatch item={selectedItem} onClose={() => setSelectedItem(null)} />
+          </div>
         )}
 
         <ResultsGrid
