@@ -182,7 +182,13 @@ function getPoster(movie) {
 export async function searchContent(query) {
   // ✅ HOMEPAGE — TOP 150 MOVIES!
   if (!query.trim()) {
-    return FEATURED.map((movie) => ({
+    const seen = new Map();
+    for (const movie of FEATURED) {
+      if (!seen.has(movie.id)) seen.set(movie.id, movie);
+    }
+    const uniqueFeatured = Array.from(seen.values());
+
+    return uniqueFeatured.map((movie) => ({
       ...movie,
       poster: getPoster(movie)
     })).sort(byRatingDescending);
