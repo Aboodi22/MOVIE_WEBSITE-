@@ -1,8 +1,6 @@
 :root {
-  /* Dark hero surface — Apple product-page launch treatment */
   --hero-bg: #000000;
 
-  /* Light content surfaces — Apple.com body sections */
   --surface: #ffffff;
   --surface-alt: #f5f5f7;
   --ink: #1d1d1f;
@@ -20,12 +18,38 @@
 
   --danger: #d70015;
 
-  --nav-height: 52px;
+  --nav-height: 60px;
 
   --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
   --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
 
   --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+    --hero-bg: #f5f5f7;
+  --hero-ink: #1d1d1f;
+  --hero-ink-muted: rgba(29, 29, 31, 0.62);
+  --hero-hairline: rgba(0, 0, 0, 0.14);
+  --hero-vignette: rgba(30, 30, 32, 0.35);
+  --hero-btn-bg: rgba(0, 0, 0, 0.05);
+  --hero-btn-bg-hover: rgba(0, 0, 0, 0.09);
+}
+
+[data-theme='dark'] {
+  --surface: #000000;
+  --surface-alt: #1c1c1e;
+  --ink: #f5f5f7;
+  --ink-muted: rgba(245, 245, 247, 0.68);
+  --hairline: rgba(255, 255, 255, 0.12);
+  --hairline-strong: rgba(255, 255, 255, 0.22);
+  --accent: #2997ff;
+  --accent-press: #0071e3;
+  --accent-soft: rgba(41, 151, 255, 0.18);
+    --hero-bg: #000000;
+  --hero-ink: #f5f5f7;
+  --hero-ink-muted: rgba(245, 245, 247, 0.68);
+  --hero-hairline: rgba(255, 255, 255, 0.14);
+  --hero-vignette: rgba(0, 0, 0, 0.55);
+  --hero-btn-bg: rgba(255, 255, 255, 0.06);
+  --hero-btn-bg-hover: rgba(255, 255, 255, 0.12);
 }
 
 * {
@@ -49,6 +73,7 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background 0.35s var(--ease), color 0.35s var(--ease);
 }
 
 a {
@@ -102,17 +127,29 @@ button {
   z-index: 50;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: transparent;
+  gap: 16px;
+  padding: 0 20px;
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
   border-bottom: 1px solid transparent;
-  transition: background 0.35s var(--ease), border-color 0.35s var(--ease), backdrop-filter 0.35s var(--ease);
+  transition: background 0.35s var(--ease), border-color 0.35s var(--ease);
 }
 
 .site-nav.is-scrolled {
   background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(20px) saturate(1.6);
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
   border-bottom: 1px solid var(--hairline);
+}
+
+[data-theme='dark'] .site-nav.is-scrolled {
+  background: rgba(18, 18, 20, 0.78);
+}
+
+.nav-search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
 }
 
 .brand-button {
@@ -120,14 +157,40 @@ button {
   border: none;
   background: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.brand-button:hover {
+  background: rgba(128, 128, 128, 0.14);
+}
+
+.brand-button:active {
+  transform: scale(0.95);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0071e3, #4fc3ff);
+  color: #ffffff;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
-  color: var(--on-dark);
-  padding: 6px 14px;
-  border-radius: 8px;
-  transition: color 0.35s var(--ease), background 0.15s ease, transform 0.15s ease;
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: -0.03em;
+  box-shadow: 0 4px 14px -4px rgba(0, 113, 227, 0.55);
+}
+
+[data-theme='dark'] .brand-mark {
+  box-shadow: 0 4px 14px -4px rgba(41, 151, 255, 0.5);
 }
 
 .site-nav.is-scrolled .brand-button {
@@ -144,6 +207,52 @@ button {
 
 .brand-dot {
   color: var(--accent);
+}
+
+.theme-toggle {
+  appearance: none;
+  border: 1px solid var(--dark-hairline);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--on-dark);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.15s ease, color 0.35s var(--ease),
+    border-color 0.35s var(--ease);
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.theme-toggle:active {
+  transform: scale(0.93);
+}
+
+.site-nav.is-scrolled .theme-toggle {
+  color: var(--ink);
+  border-color: var(--hairline);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.site-nav.is-scrolled .theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 640px) {
+  .site-nav {
+    gap: 8px;
+    padding: 0 12px;
+  }
+  .brand-button {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+  }
 }
 
 /* ---------- Offline / error banner ---------- */

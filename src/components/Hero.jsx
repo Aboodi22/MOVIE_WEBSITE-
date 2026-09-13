@@ -6,8 +6,9 @@ import * as THREE from 'three';
  * blue and rim-lit in soft white — evoking scattered film frames
  * floating in the dark rather than a generic starfield.
  */
-export default function Hero({ children }) {
+export default function Hero({ children, theme = 'light' }) {
   const mountRef = useRef(null);
+  const sceneRef = useRef(null);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -19,7 +20,9 @@ export default function Hero({ children }) {
     const height = mount.clientHeight;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x000000, 0.05);
+    const fogColor = theme === 'dark' ? 0x000000 : 0xf5f5f7;
+    scene.fog = new THREE.FogExp2(fogColor, 0.05);
+    sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
     camera.position.set(0, 0, 9);
@@ -132,8 +135,18 @@ export default function Hero({ children }) {
       shardMat.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
+      sceneRef.current = null;
     };
   }, []);
+
+  // Update the fog color live when the theme toggles, without
+  // rebuilding the whole 3D scene.
+  useEffect(() => {
+    if (sceneRef.current) {
+      const fogColor = theme === 'dark' ? 0x000000 : 0xf5f5f7;
+      sceneRef.current.fog.color.set(fogColor);
+    }
+  }, [theme]);
 
   return (
     <div className="hero">
