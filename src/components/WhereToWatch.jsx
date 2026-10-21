@@ -34,9 +34,7 @@ export default function WhereToWatch({ item, onClose }) {
         allowFullScreen
         style={{ border: 'none', borderRadius: '8px', background: '#000', marginTop: '0.5rem' }}
       />
-      <p style={{fontSize:'0.85rem',color:'#888',marginTop:'0.5rem'}}>
-        IMDb: {imdbId} • If blank → try domain #{domains.indexOf(domains[0])+2} in code
-      </p>
+      
     </div>
   );
 }
